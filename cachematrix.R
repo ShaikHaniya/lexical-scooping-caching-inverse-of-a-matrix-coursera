@@ -9,3 +9,67 @@
 ##2.get the elements of the matrix
 ##3.set the elements of the matrix inverse
 ##4.get the elements of the matrix inverse
+
+
+makeCacheMatrix <- function(x = matrix()) {
+  inv <- NULL
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL
+  }
+  get <- function() x
+  setinverse <- function(inverse) inv <<- inverse
+  getinverse <- function() inv
+  list(set = set, get = get,
+       setinverse = setinverse,
+       getinverse = getinverse)
+}
+
+##the following function calculates the special matrix created with the above function.However, it first checks to see if the inverse has already been
+#calculated.If so, it gets the inverse from the cache and skips the computation.Otherwise,it will calculate the inverse of the matrix and sets it in 
+#the cache via the setinverse function.
+
+cacheinverse <- function(x, ...) {
+  inv <- x$getinverse()
+  if(!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  matrix_to_invert <- x$get()
+  inv <- solve(matrix_to_invert, ...)
+  x$setinverse(inv)
+  inv
+}
+#example 1:
+my_Matrix <- makeCacheMatrix(matrix(1:4, 2, 2))
+my_Matrix$get()
+##      [,1] [,2]
+## [1,]    1    3
+## [2,]    2    4
+my_Matrix$getinverse()
+## NULL
+cacheinverse(my_Matrix)
+##      [,1] [,2]
+## [1,]   -2  1.5
+## [2,]    1 -0.5
+cacheinverse(my_Matrix)
+## getting cached data
+##      [,1] [,2]
+## [1,]   -2  1.5
+## [2,]    1 -0.5
+##example 2 to test the code
+my_Matrix$set(matrix(c(2, 2, 1, 4), 2, 2))
+my_Matrix$get()
+##      [,1] [,2]
+## [1,]    2    1
+## [2,]    2    4
+my_Matrix$getinverse()
+## NULL
+cacheinverse(my_Matrix)
+##            [,1]       [,2]
+## [1,]  0.6666667 -0.1666667
+## [2,] -0.3333333  0.3333333
+my_Matrix$getinverse()
+##            [,1]       [,2]
+## [1,]  0.6666667 -0.1666667
+## [2,] -0.3333333  0.3333333
